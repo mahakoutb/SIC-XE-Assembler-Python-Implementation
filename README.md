@@ -48,5 +48,50 @@ A file Input.xlsx containing the source program.
 A file OP_Code_ref.xlsx containing opcode reference data.
 Run the notebook or script to:
 
-python SICXE.py
+python SICXE.ipynb
+
+Algorithm – SIC/XE Two-Pass Assembler
+
+Load Input Data
+1.1 Read opcode reference table (OP_Code_ref.xlsx).
+1.2 Read assembly source program (Input.xlsx).
+1.3 Normalize column names (Instruction, Reference).
+
+Pass 1 – Assign Addresses & Build Symbol Table
+2.1 Initialize location_counter = 0.
+2.2 For each instruction:
+- Determine instruction Format from opcode table or directives.
+- Increment location_counter according to format or directive size.
+- Record the Location for the current line.
+2.3 For each labeled line, add {label: location} to SymTable.
+
+Pass 2 – Generate Object Codes
+3.1 Assign opcodes to instructions (ignore directives).
+3.2 Format 1: Object code = opcode.
+3.3 Format 2: Convert registers to numeric codes, build opcode+regs.
+3.4 Directives: Mark No_Object_Code for RESB, RESW, START, END, BASE.
+3.5 BYTE (hex): Remove X'...' and store hex value.
+3.6 BYTE (char): Convert each char to ASCII hex.
+3.7 WORD: Convert value to 6-digit hex.
+
+Addressing Modes & Flags
+4.1 Set N and I flags (immediate #, indirect @, or both).
+4.2 Set X flag for indexed ,X.
+4.3 Set B, P, E flags:
+- Format 4: E=1, B=0, P=0.
+- Format 3: PC-relative if displacement in range; else base-relative.
+4.4 Calculate address/disp from symbol table or immediate constant.
+
+Assemble Final Object Code
+5.1 Combine opcode (6 bits) + flags (n,i,x,b,p,e) + address/disp into binary.
+5.2 Convert binary to hex for final Object_Code.
+
+Generate HTE Records
+6.1 H Record: Program name, start address, length.
+6.2 T Records: Object codes in 30-byte blocks.
+6.3 M Records: For format 4 modifications.
+6.4 E Record: Program starting address.
+
+Output
+7.1 Display symbol table, object codes, and HTE format output.
 
